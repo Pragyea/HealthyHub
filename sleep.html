@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sleep Tracker</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0fff0;
+      text-align: center;
+      padding: 40px;
+    }
+    header {
+      background: #2a7f4f;
+      color: white;
+      padding: 20px;
+      font-size: 26px;
+    }
+    .tracker-container {
+      background: white;
+      display: inline-block;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-top: 40px;
+    }
+    input[type="time"] {
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    button {
+      padding: 12px 25px;
+      margin-top: 15px;
+      background: #2a7f4f;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #248145;
+    }
+    .result {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <header>Sleep Tracker 🌙</header>
+
+  <div class="tracker-container">
+    <h2>Track Your Sleep</h2>
+    <p>Enter the time you went to bed and woke up:</p>
+
+    <label for="bedtime">Bedtime:</label><br>
+    <input type="time" id="bedtime" required><br>
+
+    <label for="wakeuptime">Wake Up Time:</label><br>
+    <input type="time" id="wakeuptime" required><br>
+
+    <button onclick="calculateSleep()">Calculate Sleep</button>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    function calculateSleep() {
+      const bedtime = document.getElementById('bedtime').value;
+      const wakeup = document.getElementById('wakeuptime').value;
+      const resultDiv = document.getElementById('result');
+
+      if (!bedtime || !wakeup) {
+        resultDiv.textContent = "Please enter both times.";
+        return;
+      }
+
+      let [bedH, bedM] = bedtime.split(":").map(Number);
+      let [wakeH, wakeM] = wakeup.split(":").map(Number);
+
+      // Convert to minutes
+      let bedMinutes = bedH * 60 + bedM;
+      let wakeMinutes = wakeH * 60 + wakeM;
+
+      // If wakeup is on next day
+      if (wakeMinutes <= bedMinutes) {
+        wakeMinutes += 24 * 60;
+      }
+
+      let sleepMinutes = wakeMinutes - bedMinutes;
+      let hours = Math.floor(sleepMinutes / 60);
+      let minutes = sleepMinutes % 60;
+
+      resultDiv.textContent = `You slept for ${hours} hours and ${minutes} minutes.`;
+
+      // Add simple sleep tip
+      if (hours < 6) {
+        resultDiv.textContent += " 💤 Try to get more sleep for better health!";
+      } else if (hours > 9) {
+        resultDiv.textContent += " 💤 Oversleeping can also affect your energy levels.";
+      } else {
+        resultDiv.textContent += " 🌟 Great! You got a healthy amount of sleep.";
+      }
+    }
+  </script>
+</body>
+</html>

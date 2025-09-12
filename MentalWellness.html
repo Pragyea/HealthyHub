@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CalmSpace — Mental Wellbeing</title>
+  <meta name="description" content="A small mental wellbeing single-page site with mood tracker, breathing exercise, gratitude journal and calming tools."/>
+  <style>
+    :root{
+      --bg:#f6fbfb; --card:#ffffff; --muted:#6b7280; --accent:#6aa6a3; --accent-2:#7fb3c5; --glass: rgba(255,255,255,0.6);
+      --radius:14px; --pad:18px; font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    html,body{height:100%;}
+    body{
+      margin:0; background:linear-gradient(180deg,var(--bg),#eef6f6); color:#0f172a; -webkit-font-smoothing:antialiased; padding:28px;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .container{width:min(1100px,96vw); display:grid; grid-template-columns:1fr 360px; gap:20px; align-items:start}
+    header{grid-column:1 / -1; display:flex; align-items:center; justify-content:space-between}
+    h1{font-size:1.5rem; margin:0}
+    p.lead{margin:6px 0 0; color:var(--muted); font-size:0.95rem}
+
+    .card{background:var(--card); border-radius:var(--radius); padding:var(--pad); box-shadow:0 6px 22px rgba(10,20,30,0.06)}
+    .big{padding:28px}
+
+    /* Left column layout */
+    .left{display:grid; gap:16px}
+    .tools{display:grid; gap:12px}
+
+    /* Mood tracker */
+    .mood-grid{display:flex; gap:10px; flex-wrap:wrap}
+    .mood-btn{flex:1 0 60px; min-width:60px; padding:10px;border-radius:10px; border:1px solid transparent; text-align:center; cursor:pointer; background:linear-gradient(180deg, #fff, #fbfdfe)}
+    .mood-btn[aria-pressed="true"]{outline:3px solid rgba(122,179,171,0.18); box-shadow:0 6px 18px rgba(108,190,180,0.08)}
+
+    /* Breathing */
+    .breath-wrap{display:flex; gap:16px; align-items:center}
+    .breath-circle{width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,var(--accent),var(--accent-2)); color:white; font-weight:600; transition:transform 300ms ease}
+    .breath-info{color:var(--muted)}
+
+    /* Gratitude */
+    textarea{width:100%; min-height:88px; border-radius:10px; padding:12px; border:1px solid #e6eef0; resize:vertical}
+    .small{font-size:0.85rem;color:var(--muted)}
+
+    /* Right column */
+    .right{display:flex;flex-direction:column;gap:14px}
+    .quotes{font-size:0.98rem; font-weight:600}
+    .take-break{display:flex; gap:10px; align-items:center}
+    .btn{padding:10px 14px;border-radius:10px;border:0;cursor:pointer}
+    .btn-primary{background:var(--accent); color:white}
+    .btn-ghost{background:transparent; border:1px solid #e1f0ef}
+
+    /* Bubble pop canvas */
+    #bubbleCanvas{width:100%; height:220px; border-radius:10px; background:linear-gradient(180deg,#f6ffff,#f1fbfb); display:block}
+
+    footer{grid-column:1 / -1; color:var(--muted); font-size:0.84rem; margin-top:8px}
+
+    /* responsive */
+    @media (max-width:980px){ .container{grid-template-columns:1fr; } .right{order:2} }
+
+    /* reduce-motion handling */
+    @media (prefers-reduced-motion:reduce){ *{transition:none!important; animation:none!important}} 
+  </style>
+</head>
+<body>
+  <main class="container" role="main">
+    <header>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <!-- small decorative icon (optional) -->
+        <img src="https://cdn-icons-png.flaticon.com/512/4406/4406463.png" alt="mental wellness" width="36" height="36" style="border-radius:8px;">
+        <div>
+          <h1>CalmSpace</h1>
+          <p class="lead">Small single-page toolkit for daily mental wellbeing — free to use and private (stored locally).</p>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <button class="btn btn-ghost" id="exportBtn" title="Export your saved notes">Export</button>
+      </div>
+    </header>
+
+    <section class="left">
+      <section class="card big" aria-labelledby="moodTitle">
+        <h2 id="moodTitle">Mood Tracker</h2>
+        <p class="small">Tap an emoji to log how you feel today. Saved locally.</p>
+        <div class="mood-grid" role="list" aria-label="mood options">
+          <button class="mood-btn" data-mood="very-happy" aria-pressed="false" title="Very happy">😄<div class="small">Great</div></button>
+          <button class="mood-btn" data-mood="happy" aria-pressed="false" title="Happy">🙂<div class="small">Good</div></button>
+          <button class="mood-btn" data-mood="neutral" aria-pressed="false" title="Neutral">😐<div class="small">Okay</div></button>
+          <button class="mood-btn" data-mood="sad" aria-pressed="false" title="Sad">😕<div class="small">Down</div></button>
+          <button class="mood-btn" data-mood="angry" aria-pressed="false" title="Angry">😣<div class="small">Frustrated</div></button>
+        </div>
+        <div style="margin-top:12px;color:var(--muted);font-size:0.9rem">Last logged: <span id="lastLogged">—</span></div>
+      </section>
+
+      <section class="card" aria-labelledby="breathTitle">
+        <h2 id="breathTitle">Mindful Breathing</h2>
+        <div class="breath-wrap">
+          <div aria-hidden="true" class="breath-circle" id="breathCircle">Breathe</div>
+          <div class="breath-info">
+            <div id="breathInstruction">Press Start — 4s inhale, 4s hold, 6s exhale</div>
+            <div style="margin-top:8px"><button class="btn btn-primary" id="startBreath">Start</button> <button class="btn btn-ghost" id="stopBreath">Stop</button></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="gratTitle">
+        <h2 id="gratTitle">Gratitude Journal</h2>
+        <p class="small">Write 2–3 things you're grateful for. Private — saved locally to your browser.</p>
+        <textarea id="gratitudeInput" placeholder="Today I'm grateful for..."></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;align-items:center"><button class="btn btn-primary" id="saveGrat">Save</button><button class="btn btn-ghost" id="clearGrat">Clear</button><div class="small" id="gratSaved"></div></div>
+      </section>
+
+      <section class="card" aria-labelledby="sleepTitle">
+        <h2 id="sleepTitle">Calm Sounds</h2>
+        <p class="small">Play a short calming loop while you breathe or relax.</p>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+          <button class="btn btn-primary" id="playSound">Play</button>
+          <button class="btn btn-ghost" id="stopSound">Stop</button>
+          <label class="small" style="margin-left:auto">Volume <input type="range" id="volume" min="0" max="1" step="0.01" value="0.6"/></label>
+        </div>
+      </section>
+    </section>
+
+    <aside class="right">
+      <section class="card" aria-labelledby="quotesTitle">
+        <h3 id="quotesTitle">Positive Reminders</h3>
+        <div class="quotes" id="quoteBox">"Take one small step — that step matters."</div>
+        <div style="margin-top:10px; display:flex; gap:8px; align-items:center">
+          <button class="btn" id="newQuote">New</button>
+          <button class="btn btn-ghost" id="copyQuote">Copy</button>
+          <div style="margin-left:auto; font-size:0.85rem; color:var(--muted)" id="quoteAt">—</div>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="breakTitle">
+        <h3 id="breakTitle">Take a Break</h3>
+        <p class="small">Short guided micro-breaks — stretch, breathe, hydrate.</p>
+        <div class="take-break" style="margin-top:10px">
+          <button class="btn btn-primary" id="breakBtn">Start 60s Break</button>
+          <button class="btn btn-ghost" id="miniGameBtn">Play Bubble Pop</button>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="gameTitle">
+        <h3 id="gameTitle">Bubble Pop (Stress Relief)</h3>
+        <canvas id="bubbleCanvas" width="600" height="220" role="img" aria-label="Bubble popping game"></canvas>
+        <div style="display:flex;justify-content:space-between;margin-top:8px"><div class="small">Score: <span id="score">0</span></div><div class="small">Pop bubbles to score</div></div>
+      </section>
+ <section class="card" aria-labelledby="exerciseTitle">
+        <h2 id="exerciseTitle">Mental well being tips Video</h2>
+        <p class="small">Follow along with this short workout video for upliftment.</p>
+        <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px;">
+          <iframe 
+            src="https://www.youtube.com/embed/SBJ19oO8WDc" 
+            title="Exercise video" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen 
+            style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:10px;">
+          </iframe>
+        </div>
+      </section>
+
+    </aside>
+  
+    <footer class="card" style="text-align:center">This page stores everything locally in your browser (no account needed). Use on a personal device for privacy.</footer>
+  </main>
+
+  <script>
+  // Wrap initialization so everything runs after DOM is ready
+  window.addEventListener('DOMContentLoaded', () => {
+    try {
+      // --- Utilities & localStorage keys
+      const LS = { mood: 'calmspace_mood', gratitude: 'calmspace_gratitude', score: 'calmspace_score' };
+
+      // Mood tracker
+      const moodButtons = document.querySelectorAll('.mood-btn');
+      const lastLogged = document.getElementById('lastLogged');
+      function loadMood(){
+        const saved = localStorage.getItem(LS.mood);
+        if(!saved){ lastLogged.textContent='—'; moodButtons.forEach(b => b.setAttribute('aria-pressed','false')); return }
+        const data = JSON.parse(saved);
+        lastLogged.textContent = new Date(data.when).toLocaleString();
+        moodButtons.forEach(b => b.setAttribute('aria-pressed','false'));
+        const sel = document.querySelector(`.mood-btn[data-mood="${data.mood}"]`);
+        if(sel) sel.setAttribute('aria-pressed','true');
+      }
+      moodButtons.forEach(btn => btn.addEventListener('click', ()=>{
+        moodButtons.forEach(b => b.setAttribute('aria-pressed','false'));
+        btn.setAttribute('aria-pressed','true');
+        const payload = { mood: btn.dataset.mood, when: new Date().toISOString() };
+        localStorage.setItem(LS.mood, JSON.stringify(payload));
+        loadMood();
+      }));
+      loadMood();
+
+      // Gratitude
+      const gratitudeInput = document.getElementById('gratitudeInput');
+      const saveGrat = document.getElementById('saveGrat');
+      const clearGrat = document.getElementById('clearGrat');
+      const gratSaved = document.getElementById('gratSaved');
+      function loadGrat(){
+        const g = localStorage.getItem(LS.gratitude);
+        if(g){ gratitudeInput.value = g; gratSaved.textContent = 'Saved'; } else { gratitudeInput.value=''; gratSaved.textContent=''; }
+      }
+      saveGrat.addEventListener('click', ()=>{
+        localStorage.setItem(LS.gratitude, gratitudeInput.value);
+        gratSaved.textContent = 'Saved ✓';
+        setTimeout(()=>gratSaved.textContent='',1200);
+      });
+      clearGrat.addEventListener('click', ()=>{ gratitudeInput.value=''; localStorage.removeItem(LS.gratitude); gratSaved.textContent='Cleared'; setTimeout(()=>gratSaved.textContent='',1200); });
+      loadGrat();
+
+      // Quotes / Positive reminders
+      const quotes = [
+        {t:'Take one small step — that step matters.'},
+        {t:'Progress is progress, no matter how small.'},
+        {t:'You are doing the best you can with what you have.'},
+        {t:'It\'s okay to pause and breathe.'},
+        {t:'Kindness toward yourself is strength.'},
+        {t:'Small routines yield big calm.'}
+      ];
+      const quoteBox = document.getElementById('quoteBox');
+      const quoteAt = document.getElementById('quoteAt');
+      function showRandomQuote(){ const q = quotes[Math.floor(Math.random()*quotes.length)]; quoteBox.textContent=q.t; quoteAt.textContent='— Tip'; }
+      document.getElementById('newQuote').addEventListener('click', showRandomQuote);
+      document.getElementById('copyQuote').addEventListener('click', ()=>navigator.clipboard?.writeText(quoteBox.textContent));
+      showRandomQuote();
+
+      // Breathing exercise
+      const breathCircle = document.getElementById('breathCircle');
+      const startBreath = document.getElementById('startBreath');
+      const stopBreath = document.getElementById('stopBreath');
+      let breathTimer=null; let phase=0; // phases: inhale, hold, exhale
+      const phases = [ {txt:'Inhale', t:4000}, {txt:'Hold', t:4000}, {txt:'Exhale', t:6000} ];
+      function animateBreath(){
+        if(breathTimer) clearTimeout(breathTimer);
+        const p = phases[phase];
+        breathCircle.textContent = p.txt;
+        // scale circle
+        const scale = p.txt==='Inhale'?1.15:(p.txt==='Exhale'?0.85:1.0);
+        breathCircle.style.transform = `scale(${scale})`;
+        breathTimer = setTimeout(()=>{ phase = (phase+1)%phases.length; animateBreath(); }, p.t);
+      }
+      startBreath.addEventListener('click', ()=>{ phase=0; animateBreath(); startBreath.disabled=true; });
+      stopBreath.addEventListener('click', ()=>{ if(breathTimer) clearTimeout(breathTimer); breathCircle.style.transform='scale(1)'; breathCircle.textContent='Breathe'; startBreath.disabled=false; });
+
+      // Calm audio (generated via WebAudio oscillator for privacy) - cleaned up references
+      let audioCtx=null, gainNode=null, osc=null, osc2=null;
+      const playSound = document.getElementById('playSound');
+      const stopSound = document.getElementById('stopSound');
+      const volume = document.getElementById('volume');
+      function startTone(){
+        if(audioCtx) return;
+        audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+        gainNode = audioCtx.createGain();
+        gainNode.gain.value = +volume.value;
+        gainNode.connect(audioCtx.destination);
+        // create two oscillators with low frequency nice pad-like hum
+        osc = audioCtx.createOscillator();
+        osc2 = audioCtx.createOscillator();
+        osc.type = 'sine'; osc2.type = 'sine';
+        osc.frequency.value = 220; osc2.frequency.value = 261.6;
+        osc.connect(gainNode); osc2.connect(gainNode);
+        osc.start(); osc2.start();
+      }
+      function stopTone(){
+        if(!audioCtx) return;
+        try{ if(osc) osc.stop(); if(osc2) osc2.stop(); }catch(e){}
+        audioCtx.close(); audioCtx=null; gainNode=null; osc=null; osc2=null;
+      }
+      playSound.addEventListener('click', ()=>startTone());
+      stopSound.addEventListener('click', ()=>stopTone());
+      volume.addEventListener('input', ()=>{ if(gainNode) gainNode.gain.value = +volume.value });
+
+      // Export notes (simple JSON download)
+      document.getElementById('exportBtn').addEventListener('click', ()=>{
+        const data = {
+          mood: localStorage.getItem(LS.mood), gratitude: localStorage.getItem(LS.gratitude), score: localStorage.getItem(LS.score)
+        };
+        const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href=url; a.download='calmspace-export.json'; a.click(); URL.revokeObjectURL(url);
+      });
+
+      // Take a break timer (accessible simple countdown)
+      document.getElementById('breakBtn').addEventListener('click', ()=>{
+        const start = Date.now(); const dur=60; // 60s
+        const btn = document.getElementById('breakBtn');
+        btn.disabled=true;
+        let remaining = dur;
+        const interval = setInterval(()=>{
+          remaining = dur - Math.floor((Date.now()-start)/1000);
+          btn.textContent = `Break: ${remaining}s`;
+          if(remaining<=0){ clearInterval(interval); btn.disabled=false; btn.textContent='Start 60s Break'; alert('Break finished — stretch and take a sip of water!'); }
+        },250);
+      });
+
+      // Bubble pop game (robust resize + DPR handling)
+      const canvas = document.getElementById('bubbleCanvas');
+      const ctx = canvas.getContext('2d');
+      let cw = canvas.clientWidth, ch = canvas.clientHeight; // logical (CSS) pixels used for game logic
+      let bubbles = [];
+      let gameScore=0;
+      const scoreEl = document.getElementById('score');
+
+      function rand(min,max){return Math.random()*(max-min)+min}
+
+      function makeBubble(){ bubbles.push({x:rand(20,cw-20), y:ch+20, r:rand(12,32), vy: -rand(0.6,2.2), vx: rand(-0.6,0.6), life:1}); }
+
+      function resizeCanvas(){
+        const ratio = window.devicePixelRatio || 1;
+        const vw = canvas.clientWidth;
+        const vh = canvas.clientHeight;
+        // set internal pixel buffer for crispness
+        canvas.width = Math.max(1, Math.floor(vw * ratio));
+        canvas.height = Math.max(1, Math.floor(vh * ratio));
+        // scale so drawing coordinates use CSS pixels
+        ctx.setTransform(ratio,0,0,ratio,0,0);
+        cw = vw; ch = vh;
+      }
+
+      // ensure sizing runs after layout
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      // spawn loop
+      setInterval(()=>{ if(bubbles.length<14) makeBubble(); },700);
+
+      function gameLoop(){
+        ctx.clearRect(0,0,cw,ch);
+        for(let i=bubbles.length-1;i>=0;i--){ const b=bubbles[i]; b.x += b.vx; b.y += b.vy; b.vy -= 0.006; // slight float
+          ctx.beginPath(); ctx.globalAlpha = 0.9*b.life; ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+          ctx.fillStyle = 'rgba(135, 222, 219, 0.9)'; ctx.fill(); ctx.lineWidth=1; ctx.strokeStyle='rgba(255,255,255,0.7)'; ctx.stroke();
+          if(b.y + b.r < -40) bubbles.splice(i,1);
+        }
+        ctx.globalAlpha=1; requestAnimationFrame(gameLoop);
+      }
+      requestAnimationFrame(gameLoop);
+
+      // pop on pointer/touch
+      canvas.addEventListener('pointerdown', (e)=>{
+        const rect=canvas.getBoundingClientRect();
+        const x=(e.clientX-rect.left);
+        const y=(e.clientY-rect.top);
+        for(let i=bubbles.length-1;i>=0;i--){ const b=bubbles[i]; const d = Math.hypot(b.x-x,b.y-y); if(d < b.r){ // pop
+            bubbles.splice(i,1); gameScore += Math.round(10 + b.r); scoreEl.textContent = gameScore; localStorage.setItem(LS.score, gameScore); // quick feedback
+            break;
+          }}
+      });
+
+      // Load saved score
+      if(localStorage.getItem(LS.score)) { gameScore = parseInt(localStorage.getItem(LS.score),10)||0; scoreEl.textContent=gameScore }
+
+      // miniGame button focus
+      document.getElementById('miniGameBtn').addEventListener('click', ()=>{ canvas.scrollIntoView({behavior:'smooth', block:'center'}); });
+
+      // init accessibility: keyboard mood selection
+      moodButtons.forEach((b,i)=>{ b.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); b.click(); } }); });
+
+      // friendly tip: keyboard shortcut to quick-save gratitude (Ctrl+Enter)
+      gratitudeInput.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey) && e.key==='Enter'){ saveGrat.click(); } });
+
+      // friendly welcome: check localStorage space (best-effort)
+      try{ localStorage.setItem('_calm_test','1'); localStorage.removeItem('_calm_test'); }catch(e){ alert('Local storage appears disabled. Your entries will not be saved.'); }
+
+      console.log('CalmSpace initialized');
+    } catch (err) {
+      console.error('Initialization error', err);
+      alert('An unexpected error occurred while starting CalmSpace. Open the browser console (F12) and share the error message so I can help.');
+    }
+  });
+  </script>
+</body>
+</html>

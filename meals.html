@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Smart Meal Planner</title>
+  <style>
+    body {margin:0;font-family:Arial, sans-serif;background:#f4fff4;}
+    header {background:#2a7f4f;color:white;padding:15px;font-size:20px;text-align:center;}
+    .container {padding:30px;max-width:800px;margin:auto;}
+    input, button {
+      width:100%;padding:12px;margin:10px 0;
+      border-radius:8px;border:1px solid #ccc;font-size:16px;
+    }
+    button {background:#2a7f4f;color:white;cursor:pointer;}
+    button:hover {background:#248145;}
+    .meal {background:white;padding:20px;margin:20px 0;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.1);}
+    .meal h3 {margin:0;color:#2a7f4f;}
+    table {width:100%;margin-top:8px;border-collapse:collapse;}
+    th, td {padding:6px;border:1px solid #ddd;text-align:center;font-size:14px;}
+    th {background:#f0f7f0;}
+  </style>
+</head>
+<body>
+  <header>🥗 Healthy Meal Planner</header>
+  <div class="container">
+    <h2>What’s in your fridge? 🥦🥚🍅</h2>
+    <p>Enter ingredients separated by commas:</p>
+    <input type="text" id="ingredients" placeholder="e.g. eggs, spinach, tomato, chicken">
+    <button onclick="generateMeals()">Generate Meal Plan</button>
+
+    <div id="results"></div>
+  </div>
+
+  <script>
+    const recipes = {
+      "eggs": { 
+        meal:"Veggie Omelette", 
+        nutrition:{cal:250, protein:18, carbs:6, fat:16},
+        recipe:"Whisk 2 eggs, add chopped spinach and tomato. Heat pan with 1 tsp oil, pour mixture, cook until fluffy. Serve warm."
+      },
+      "spinach": { 
+        meal:"Spinach & Quinoa Salad", 
+        nutrition:{cal:320, protein:12, carbs:45, fat:10},
+        recipe:"Cook quinoa, mix with fresh spinach, tomato, cucumber, olive oil, and lemon juice. Toss and enjoy."
+      },
+      "chicken": { 
+        meal:"Grilled Chicken with Veggies", 
+        nutrition:{cal:450, protein:40, carbs:20, fat:15},
+        recipe:"Marinate chicken with olive oil, garlic, and herbs. Grill for 15 mins. Serve with steamed broccoli and carrots."
+      },
+      "banana": { 
+        meal:"Banana Smoothie", 
+        nutrition:{cal:200, protein:5, carbs:45, fat:2},
+        recipe:"Blend 1 banana, 1 cup milk (or almond milk), 1 tsp honey, and ice until smooth."
+      }
+    };
+
+    function generateMeals(){
+      const input = document.getElementById("ingredients").value.toLowerCase();
+      const ingList = input.split(",").map(i=>i.trim());
+      let output = "";
+
+      if(ingList.length === 0 || input === ""){
+        alert("Please enter at least one ingredient.");
+        return;
+      }
+
+      ingList.forEach(ing=>{
+        if(recipes[ing]){
+          const r = recipes[ing];
+          output += `
+            <div class="meal">
+              <h3>${r.meal}</h3>
+              <p><b>Made with:</b> ${ing}</p>
+              <table>
+                <tr><th>Calories</th><th>Protein (g)</th><th>Carbs (g)</th><th>Fat (g)</th></tr>
+                <tr>
+                  <td>${r.nutrition.cal}</td>
+                  <td>${r.nutrition.protein}</td>
+                  <td>${r.nutrition.carbs}</td>
+                  <td>${r.nutrition.fat}</td>
+                </tr>
+              </table>
+              <p><b>Recipe:</b> ${r.recipe}</p>
+            </div>
+          `;
+        }
+      });
+
+      if(output === ""){
+        output = `<p>No recipes found for your ingredients 😢</p>`;
+      }
+
+      document.getElementById("results").innerHTML = output;
+    }
+  </script>
+</body>
+</html>

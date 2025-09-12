@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Healthy Life Hub</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0fff0;
+      text-align: center;
+    }
+    header {
+      background: #2a7f4f;
+      color: white;
+      padding: 20px;
+      font-size: 26px;
+    }
+    .top-quote {
+      font-size: 22px;
+      font-style: italic;
+      color: #ffffff;
+      background: #248145;
+      padding: 15px 10px;
+      margin: 0;
+    }
+    .container {
+      padding: 40px;
+    }
+    .card {
+      display: inline-block;
+      width: 250px;
+      margin: 20px;
+      padding: 20px;
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+      vertical-align: top;
+    }
+    .card:hover {
+      transform: scale(1.05);
+    }
+    img {
+      width: 100px;
+      margin-bottom: 15px;
+    }
+    a {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 10px 20px;
+      background: #2a7f4f;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+    }
+    a:hover {
+      background: #248145;
+    }
+  </style>
+</head>
+<body>
+  <header>Healthy Life Hub 🌿</header>
+  <div class="top-quote" id="topQuote">"Health is the greatest gift, contentment the greatest wealth."</div>
+
+  <div class="container">
+    <!-- Health Cards -->
+    <div class="card">
+      <img src="https://cdn-icons-png.flaticon.com/512/1048/1048949.png" alt="Exercise">
+      <h3>Healthy Exercises</h3>
+      <p>Get a personalized exercise plan based on your body stats.</p>
+      <a href="exercise.html">Start Now</a>
+    </div>
+
+    <div class="card">
+      <img src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png" alt="Meals">
+      <h3>Healthy Meals</h3>
+      <p>Enter ingredients you have and get meal plans with nutrition.</p>
+      <a href="meals.html">Plan Meals</a>
+    </div>
+
+    <div class="card">
+      <img src="https://cdn-icons-png.flaticon.com/512/2920/2920244.png" alt="Mental Wellness">
+      <h3>Mental Wellness</h3>
+      <p>Relax your mind with calming tools and exercises.</p>
+      <a href="MentalWellness.html">Start Now</a>
+    </div>
+
+    <div class="card">
+      <img src="https://cdn-icons-png.flaticon.com/512/681/681494.png" alt="Sleep Tracker">
+      <h3>Sleep Tracker</h3>
+      <p>Monitor your sleep patterns for better rest and recovery.</p>
+      <a href="sleep.html">Track Sleep</a>
+    </div>
+
+    <div class="card">
+      <img src="https://cdn-icons-png.flaticon.com/512/727/727245.png" alt="Hydration">
+      <h3>Hydration Reminder</h3>
+      <p>Get reminders to drink water throughout the day.</p>
+      <a href="hydration.html">Stay Hydrated</a>
+    </div>
+
+    <div class="card">
+      <img src="https://cdn-icons-png.flaticon.com/512/2950/2950339.png" alt="Meditation">
+      <h3>Mindful Meditation</h3>
+      <p>Follow guided meditation sessions to reduce stress and relax.</p>
+      <a href="meditation.html">Meditate</a>
+    </div>
+  </div>
+
+  <script>
+    // Optional: You can rotate top quotes if you like
+    const quotes = [
+      "Health is the greatest gift, contentment the greatest wealth.",
+      "Take care of your body. It's the only place you have to live.",
+      "Eat well, move daily, hydrate often, sleep deep.",
+      "A healthy mind lives in a healthy body.",
+      "Small steps every day lead to big results."
+    ];
+    let index = 0;
+    const topQuote =

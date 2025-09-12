@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hydration Reminder</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0fff0;
+      text-align: center;
+      padding: 40px;
+    }
+    header {
+      background: #2a7f4f;
+      color: white;
+      padding: 20px;
+      font-size: 26px;
+    }
+    .container {
+      background: white;
+      display: inline-block;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-top: 40px;
+      width: 300px;
+    }
+    input[type="number"] {
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+      width: 100px;
+    }
+    button {
+      padding: 12px 25px;
+      margin-top: 15px;
+      background: #2a7f4f;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #248145;
+    }
+    .progress-container {
+      margin-top: 20px;
+      background: #e0e0e0;
+      border-radius: 12px;
+      height: 25px;
+      width: 100%;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 25px;
+      background: #2a7f4f;
+      width: 0%;
+      text-align: center;
+      color: white;
+      line-height: 25px;
+    }
+    .status {
+      margin-top: 15px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <header>Hydration Reminder 💧</header>
+
+  <div class="container">
+    <h2>Track Your Water Intake</h2>
+    <p>Set your daily water goal (glasses):</p>
+    <input type="number" id="goal" min="1" placeholder="e.g., 8"><br>
+    <button onclick="setGoal()">Set Goal</button>
+
+    <div class="status" id="status"></div>
+
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar">0%</div>
+    </div>
+
+    <button onclick="drinkWater()" style="margin-top:20px;">I Drank a Glass</button>
+  </div>
+
+  <script>
+    let dailyGoal = 0;
+    let glassesDrunk = 0;
+
+    const status = document.getElementById('status');
+    const progressBar = document.getElementById('progressBar');
+
+    function setGoal() {
+      const input = document.getElementById('goal').value;
+      dailyGoal = parseInt(input);
+      glassesDrunk = 0;
+
+      if(dailyGoal > 0){
+        updateProgress();
+        status.textContent = `Daily goal set to ${dailyGoal} glasses. Start drinking!`;
+      } else {
+        status.textContent = "Please enter a valid number.";
+      }
+    }
+
+    function drinkWater() {
+      if(dailyGoal === 0){
+        status.textContent = "Set your daily goal first!";
+        return;
+      }
+
+      glassesDrunk++;
+      if(glassesDrunk > dailyGoal) glassesDrunk = dailyGoal;
+
+      updateProgress();
+      status.textContent = `You have drunk ${glassesDrunk} of ${dailyGoal} glasses.`;
+
+      if(glassesDrunk === dailyGoal){
+        status.textContent += " 🎉 Congratulations! You've reached your daily water goal!";
+      }
+    }
+
+    function updateProgress() {
+      const percent = Math.floor((glassesDrunk / dailyGoal) * 100);
+      progressBar.style.width = percent + "%";
+      progressBar.textContent = percent + "%";
+    }
+  </script>
+</body>
+</html>

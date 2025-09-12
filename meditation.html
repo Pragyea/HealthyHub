@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mindful Meditation</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0fff0;
+      text-align: center;
+      padding: 40px;
+    }
+    header {
+      background: #2a7f4f;
+      color: white;
+      padding: 20px;
+      font-size: 26px;
+    }
+    .container {
+      background: white;
+      display: inline-block;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-top: 40px;
+      width: 300px;
+    }
+    select, button {
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #2a7f4f;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #248145;
+    }
+    .timer {
+      font-size: 36px;
+      margin-top: 20px;
+      color: #2a7f4f;
+    }
+    .breathing-circle {
+      margin: 30px auto;
+      width: 100px;
+      height: 100px;
+      background: #2a7f4f;
+      border-radius: 50%;
+      animation: breathe 4s infinite alternate;
+    }
+    @keyframes breathe {
+      0% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.5); opacity: 0.5; }
+      100% { transform: scale(1); opacity: 0.8; }
+    }
+  </style>
+</head>
+<body>
+  <header>Mindful Meditation 🧘‍♀️</header>
+
+  <div class="container">
+    <h2>Start a Meditation Session</h2>
+    <p>Choose your duration:</p>
+    <select id="duration">
+      <option value="3">3 minutes</option>
+      <option value="5">5 minutes</option>
+      <option value="10">10 minutes</option>
+    </select><br>
+    <button onclick="startMeditation()">Start Meditation</button>
+
+    <div class="timer" id="timer">00:00</div>
+    <div class="breathing-circle"></div>
+
+    <audio id="calmAudio" loop>
+      <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+  </div>
+
+  <script>
+    let countdown;
+    function startMeditation()
