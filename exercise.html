@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise Planner</title>
+  <style>
+    body {margin:0;font-family:Arial, sans-serif;background:#f9fff9;}
+    header {background:#2a7f4f;color:white;padding:15px;font-size:22px;text-align:center;}
+    .container {padding:30px;max-width:600px;margin:auto;}
+    input, select, button {
+      width:100%;padding:12px;margin:10px 0;border-radius:8px;
+      border:1px solid #ccc;font-size:16px;
+    }
+    button {background:#2a7f4f;color:white;cursor:pointer;}
+    button:hover {background:#248145;}
+    .plan {background:white;padding:20px;margin-top:20px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+    img {width:120px;display:block;margin:10px auto;}
+    h3 {color:#2a7f4f;}
+    a.video-link {
+      display:inline-block;
+      margin-top:10px;
+      padding:8px 12px;
+      background:#2a7f4f;
+      color:white;
+      border-radius:6px;
+      text-decoration:none;
+    }
+    a.video-link:hover {background:#248145;}
+  </style>
+</head>
+<body>
+  <header>🏋️ Personalized Exercise Plan</header>
+  <div class="container">
+    <p><b>Enter your details:</b></p>
+    <input type="number" id="age" placeholder="Age (years)">
+    <input type="number" id="height" placeholder="Height (cm)">
+    <input type="number" id="weight" placeholder="Weight (kg)">
+    <select id="gender">
+      <option value="">Select Gender</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
+    <button onclick="generatePlan()">Get Exercise Plan</button>
+
+    <div id="results"></div>
+  </div>
+
+  <script>
+    function generatePlan(){
+      let age = document.getElementById("age").value;
+      let height = document.getElementById("height").value;
+      let weight = document.getElementById("weight").value;
+      let gender = document.getElementById("gender").value;
+      let result = "";
+
+      if(!age || !height || !weight || !gender){
+        alert("⚠️ Please fill all fields");
+        return;
+      }
+
+      let bmi = (weight / ((height/100) ** 2)).toFixed(1);
+
+      if(bmi < 18.5){
+        result = `
+          <div class="plan">
+            <img src="https://cdn-icons-png.flaticon.com/512/2965/2965567.png" alt="Yoga">
+            <h3>Light Strength + Yoga</h3>
+            <p>✅ Your BMI is <b>${bmi}</b> (Underweight).<br>
+            Focus on <b>muscle-building exercises and yoga</b>.<br>
+            👉 Try 20 min yoga + 30 min light weights daily.</p>
+            <a class="video-link" href="https://www.youtube.com/watch?v=IT94xC35u6k" target="_blank">▶ Watch Guide</a>
+          </div>`;
+      }
+      else if(bmi >= 18.5 && bmi < 25){
+        result = `
+          <div class="plan">
+            <img src="https://cdn-icons-png.flaticon.com/512/2965/2965565.png" alt="Cardio">
+            <h3>Balanced Fitness</h3>
+            <p>✅ Your BMI is <b>${bmi}</b> (Healthy).<br>
+            Maintain it with a balanced plan:<br>
+            👉 30 min cardio, 20 min strength training, 10 min stretching daily.</p>
+            <a class="video-link" href="https://www.youtube.com/watch?v=IT94xC35u6k" target="_blank">▶ Watch Guide</a>
+          </div>`;
+      }
+      else {
+        result = `
+          <div class="plan">
+            <img src="https://cdn-icons-png.flaticon.com/512/2965/2965562.png" alt="Running">
+            <h3>Weight Loss Focus</h3>
+            <p>⚠️ Your BMI is <b>${bmi}</b> (Overweight).<br>
+            Focus on <b>cardio & fat burning</b>:<br>
+            👉 40 min brisk walk/run + 20 min bodyweight exercises.</p>
+            <a class="video-link" href="https://www.youtube.com/watch?v=IT94xC35u6k" target="_blank">▶ Watch Guide</a>
+          </div>`;
+      }
+
+      document.getElementById("results").innerHTML = result;
+    }
+  </script>
+</body>
+</html>
